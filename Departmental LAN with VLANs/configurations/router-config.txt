@@ -21,8 +21,6 @@ show ip interface brief
 
 show ip route
 
-show running-config
-
 end
 
 copy running-config startup-config
