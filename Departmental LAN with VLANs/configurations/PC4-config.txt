@@ -1,0 +1,11 @@
+**PC4-SALES**
+Go to:
+PC4
+→ Desktop
+→ IP Configuration
+
+Enter:
+
+IP Address:      192.168.20.12
+Subnet Mask:     255.255.255.0
+Default Gateway: 192.168.20.1
