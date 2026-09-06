@@ -1,0 +1,11 @@
+**PC3-SALES**
+Go to:
+PC3
+→ Desktop
+→ IP Configuration
+
+Enter:
+
+IP Address:      192.168.20.11
+Subnet Mask:     255.255.255.0
+Default Gateway: 192.168.20.1
