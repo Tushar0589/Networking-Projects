@@ -1,0 +1,11 @@
+**PC1-HR**
+Go to:
+PC1
+→ Desktop
+→ IP Configuration
+
+Enter:
+
+IP Address:      192.168.10.11
+Subnet Mask:     255.255.255.0
+Default Gateway: 192.168.10.1
