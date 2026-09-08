@@ -1,0 +1,96 @@
+=========================================================
+Network Monitoring Lab
+Management PC Configuration
+=========================================================
+
+Device Name:
+Management-PC
+
+IP Configuration:
+
+IP Address:        192.168.10.101
+Subnet Mask:       255.255.255.0
+Default Gateway:   192.168.10.1
+DNS Server:        8.8.8.8
+
+Network:
+Management LAN
+
+Connected Switch:
+SW1-MGMT
+
+Connected Port:
+SW1 FastEthernet0/4
+
+=========================================================
+SSH TESTING
+=========================================================
+
+Open:
+
+Desktop
+   ↓
+Command Prompt
+
+Test Router1:
+
+ssh -l admin 192.168.10.1
+
+Username:
+admin
+
+Password:
+Cisco@123
+
+Expected Result:
+
+R1-CORE#
+
+---------------------------------------------------------
+
+Test Switch1:
+
+ssh -l admin 192.168.10.2
+
+Username:
+admin
+
+Password:
+Cisco@123
+
+Expected Result:
+
+SW1-MGMT#
+
+---------------------------------------------------------
+
+Test Router2:
+
+ssh -l admin 10.0.0.2
+
+Username:
+admin
+
+Password:
+Cisco@123
+
+Expected Result:
+
+R2-EDGE#
+
+=========================================================
+PING TESTS
+=========================================================
+
+ping 192.168.10.1
+ping 192.168.10.2
+ping 192.168.10.100
+ping 192.168.20.1
+ping 192.168.20.2
+ping 192.168.20.10
+ping 192.168.20.11
+
+Expected Result:
+Successful replies
+
+=========================================================
