@@ -1,0 +1,41 @@
+=========================================================
+Network Monitoring Lab
+PC1 Configuration
+=========================================================
+
+Device Name:
+PC1
+
+IP Configuration:
+
+IP Address:        192.168.10.10
+Subnet Mask:       255.255.255.0
+Default Gateway:   192.168.10.1
+DNS Server:        8.8.8.8
+
+Network:
+LAN 1
+
+Connected Switch:
+SW1-MGMT
+
+Connected Port:
+SW1 FastEthernet0/1
+
+=========================================================
+Verification
+=========================================================
+
+From PC1 Command Prompt:
+
+ping 192.168.10.1
+ping 192.168.10.2
+ping 192.168.10.100
+ping 192.168.10.101
+ping 192.168.20.1
+ping 192.168.20.10
+
+Expected Result:
+Successful replies
+
+=========================================================
