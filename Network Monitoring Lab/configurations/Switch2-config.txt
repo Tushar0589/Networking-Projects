@@ -1,0 +1,113 @@
+! =========================================================
+! Network Monitoring Lab
+! Switch 2 - Edge LAN Switch
+! Hostname: SW2-EDGE
+! =========================================================
+
+enable
+configure terminal
+
+! -------------------------
+! Basic Configuration
+! -------------------------
+hostname SW2-EDGE
+no ip domain-lookup
+ip domain-name networklab.local
+
+! -------------------------
+! Management VLAN
+! VLAN 1
+! -------------------------
+interface vlan 1
+ description Management-Interface
+ ip address 192.168.20.2 255.255.255.0
+ no shutdown
+ exit
+
+! -------------------------
+! Default Gateway
+! -------------------------
+ip default-gateway 192.168.20.1
+
+! -------------------------
+! Syslog Configuration
+! -------------------------
+logging 192.168.10.100
+logging trap informational
+logging buffered 16384
+
+! -------------------------
+! CDP
+! -------------------------
+cdp run
+
+! -------------------------
+! LLDP
+! -------------------------
+lldp run
+
+! -------------------------
+! SSH Configuration
+! -------------------------
+username admin privilege 15 secret Cisco@123
+
+crypto key generate rsa modulus 1024
+ip ssh version 2
+
+line vty 0 4
+ login local
+ transport input ssh
+ exit
+
+! -------------------------
+! Console Configuration
+! -------------------------
+line console 0
+ logging synchronous
+ exit
+
+! -------------------------
+! Access Ports
+! -------------------------
+interface FastEthernet0/1
+ description PC3
+ switchport mode access
+ spanning-tree portfast
+ no shutdown
+ exit
+
+interface FastEthernet0/2
+ description PC4
+ switchport mode access
+ spanning-tree portfast
+ no shutdown
+ exit
+
+! -------------------------
+! Uplink to Router2
+! -------------------------
+interface GigabitEthernet0/1
+ description UPLINK-to-R2
+ no shutdown
+ exit
+
+! -------------------------
+! Save Configuration
+! -------------------------
+end
+copy running-config startup-config
+
+! =========================================================
+! Verification Commands
+! =========================================================
+!
+! show ip interface brief
+! show cdp neighbors
+! show cdp neighbors detail
+! show lldp neighbors
+! show lldp neighbors detail
+! show logging
+! show ip ssh
+! ping 192.168.20.1
+!
+! =========================================================
