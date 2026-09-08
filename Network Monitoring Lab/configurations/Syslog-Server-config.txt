@@ -1,0 +1,101 @@
+=========================================================
+Network Monitoring Lab
+Centralized Syslog Server Configuration
+=========================================================
+
+Device Name:
+SYSLOG-SERVER
+
+IP Configuration:
+
+IP Address:        192.168.10.100
+Subnet Mask:       255.255.255.0
+Default Gateway:   192.168.10.1
+DNS Server:        8.8.8.8
+
+Network:
+Management LAN
+
+Connected Switch:
+SW1-MGMT
+
+Connected Port:
+SW1 FastEthernet0/3
+
+=========================================================
+SYSLOG SERVICE
+=========================================================
+
+Open:
+
+Server
+   ↓
+Services
+   ↓
+SYSLOG
+
+Set:
+
+SYSLOG Service: ON
+
+=========================================================
+EXPECTED LOG SOURCES
+=========================================================
+
+R1-CORE
+IP: 192.168.10.1
+
+R2-EDGE
+IP: 192.168.20.1
+
+SW1-MGMT
+IP: 192.168.10.2
+
+SW2-EDGE
+IP: 192.168.20.2
+
+=========================================================
+EXPECTED EVENTS
+=========================================================
+
+1. Interface Up Event
+2. Interface Down Event
+3. Configuration Change
+4. Device Startup
+5. Login/Event Messages
+6. System Messages
+
+=========================================================
+SYSLOG TEST
+=========================================================
+
+On R1:
+
+configure terminal
+interface gigabitEthernet 0/0
+shutdown
+end
+
+Wait for Syslog message.
+
+Then:
+
+configure terminal
+interface gigabitEthernet 0/0
+no shutdown
+end
+
+Check:
+
+Server
+   ↓
+Services
+   ↓
+SYSLOG
+
+Expected Result:
+
+Interface DOWN and Interface UP events
+should appear in the Syslog event list.
+
+=========================================================
