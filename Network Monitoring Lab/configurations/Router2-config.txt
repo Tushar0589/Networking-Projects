@@ -1,0 +1,104 @@
+! =========================================================
+! Network Monitoring Lab
+! Router 2 - Edge Router
+! Hostname: R2-EDGE
+! =========================================================
+
+enable
+configure terminal
+
+! -------------------------
+! Basic Configuration
+! -------------------------
+hostname R2-EDGE
+no ip domain-lookup
+ip domain-name networklab.local
+
+! -------------------------
+! Local User for SSH
+! -------------------------
+username admin privilege 15 secret Cisco@123
+
+! -------------------------
+! Interface G0/0
+! LAN 2 - 192.168.20.0/24
+! -------------------------
+interface GigabitEthernet0/0
+ description LAN-to-SW2
+ ip address 192.168.20.1 255.255.255.0
+ no shutdown
+ exit
+
+! -------------------------
+! Interface G0/1
+! R2-to-R1 Transit Network
+! 10.0.0.0/30
+! -------------------------
+interface GigabitEthernet0/1
+ description WAN-to-R1
+ ip address 10.0.0.2 255.255.255.252
+ no shutdown
+ exit
+
+! -------------------------
+! Static Route to LAN 1
+! -------------------------
+ip route 192.168.10.0 255.255.255.0 10.0.0.1
+
+! -------------------------
+! Syslog Configuration
+! -------------------------
+logging 192.168.10.100
+logging trap informational
+logging buffered 16384
+
+! -------------------------
+! CDP
+! -------------------------
+cdp run
+
+! -------------------------
+! LLDP
+! -------------------------
+lldp run
+
+! -------------------------
+! SSH Configuration
+! -------------------------
+crypto key generate rsa modulus 1024
+ip ssh version 2
+
+line vty 0 4
+ login local
+ transport input ssh
+ exit
+
+! -------------------------
+! Console Security
+! -------------------------
+line console 0
+ logging synchronous
+ exit
+
+! -------------------------
+! Save Configuration
+! -------------------------
+end
+copy running-config startup-config
+
+! =========================================================
+! Verification Commands
+! =========================================================
+!
+! show ip interface brief
+! show ip route
+! show cdp neighbors
+! show cdp neighbors detail
+! show lldp neighbors
+! show lldp neighbors detail
+! show ip ssh
+! show logging
+! ping 10.0.0.1
+! ping 192.168.10.1
+!
+! =========================================================
