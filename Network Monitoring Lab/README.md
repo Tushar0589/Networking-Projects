@@ -1,235 +1,792 @@
 # 📡 Network Monitoring Lab using Cisco Packet Tracer
 
-A hands-on networking project that demonstrates how to implement **network monitoring, device discovery, secure remote management, and centralized logging** using **Cisco Packet Tracer**. This lab focuses on configuring **Syslog**, **CDP**, **LLDP**, and **SSH** to simulate real-world network monitoring and management in an enterprise environment.
+A hands-on **Network Monitoring and Secure Device Management Lab** built using **Cisco Packet Tracer**. This project demonstrates centralized network logging, Cisco and vendor-neutral neighbor discovery, secure remote administration, IP connectivity, and network-event monitoring using **Syslog, CDP, LLDP, and SSH**.
+
+The lab simulates a small enterprise network environment and focuses on practical skills required for **Network Engineers, NOC Engineers, Network Support Engineers, and System Administrators**.
 
 ---
 
-## 📖 Project Overview
+## 🎯 Project Objectives
 
-Modern enterprise networks rely on monitoring and management protocols to ensure network availability, troubleshoot issues, and maintain security.
+The main objectives of this project are to:
 
-In this project, network devices are configured to:
-
-- Send logs to a centralized **Syslog Server**
-- Discover neighboring devices using **CDP** and **LLDP**
-- Allow secure remote administration through **SSH**
-- Monitor interface status, login attempts, and configuration changes
-
-This project demonstrates essential networking concepts commonly used by **Network Engineers**, **NOC Engineers**, and **System Administrators**.
-
----
-
-## 🎯 Objectives
-
-- Configure centralized Syslog logging
-- Enable Cisco Discovery Protocol (CDP)
-- Configure Link Layer Discovery Protocol (LLDP)
-- Secure devices using SSH
-- Monitor network events
-- Verify log generation and collection
-- Practice enterprise network monitoring
+* Configure a multi-router and multi-switch enterprise-style network
+* Configure IPv4 addressing and static routing
+* Implement centralized Syslog logging
+* Configure Cisco Discovery Protocol (CDP)
+* Configure Link Layer Discovery Protocol (LLDP)
+* Secure network-device management using SSH
+* Monitor interface status and configuration events
+* Verify network connectivity and device reachability
+* Practice Cisco IOS CLI configuration and troubleshooting
+* Document network configurations and verification results
 
 ---
 
-## 🏗️ Network Topology
+# 🏗️ Network Topology
 
-The network consists of:
+The topology consists of:
 
-- 2 Cisco Routers
-- 2 Cisco Layer 2 Switches
-- Syslog Server
-- Management PC
-- Multiple End Devices
+* 2 × Cisco Routers
+* 2 × Cisco Layer 2 Switches
+* 1 × Syslog Server
+* 1 × Management PC
+* 4 × End Devices
 
----
+### Logical Topology
 
-## ⚙️ Technologies Used
+```text
+                         ┌─────────────────┐
+                         │     Router 1    │
+                         │    R1-CORE      │
+                         │ 192.168.10.1    │
+                         └────────┬────────┘
+                                  │
+                            10.0.0.1/30
+                                  │
+                            10.0.0.2/30
+                                  │
+                         ┌────────┴────────┐
+                         │     Router 2    │
+                         │    R2-EDGE      │
+                         │ 192.168.20.1    │
+                         └────────┬────────┘
+                                  │
+                         ┌────────┴────────┐
+                         │    Switch 2     │
+                         │   SW2-EDGE      │
+                         │ 192.168.20.2    │
+                         └───────┬─┬───────┘
+                                 │ │
+                               PC3 PC4
 
-- Cisco Packet Tracer
-- Cisco IOS CLI
-- Syslog
-- SSH
-- CDP
-- LLDP
-- IPv4 Addressing
-- Layer 2 Switching
-- Router Configuration
 
----
+       ┌─────────────────────────────────────┐
+       │              Switch 1               │
+       │             SW1-MGMT                │
+       │           192.168.10.2              │
+       └──────┬────────┬────────┬────────────┘
+              │        │        │
+             PC1      PC2    Syslog Server
+                              192.168.10.100
 
-## ✨ Features
-
-- Centralized Syslog Server
-- Secure Remote Login using SSH
-- Automatic Neighbor Discovery
-- Network Device Monitoring
-- Event Logging
-- Configuration Change Tracking
-- Interface Status Monitoring
-
----
-
-# 🔧 Technologies Implemented
-
-## 📄 Syslog
-
-Configured network devices to send logs to a centralized Syslog server.
-
-### Logs Captured
-
-- Interface Up Events
-- Interface Down Events
-- Device Startup
-- Configuration Changes
-- Login Attempts
-- Security Notifications
-- System Messages
+                              │
+                        Management PC
+                        192.168.10.101
+```
 
 ---
 
-## 🔍 Cisco Discovery Protocol (CDP)
+# 🌐 IP Addressing Plan
 
-Configured CDP to automatically discover directly connected Cisco devices.
+## LAN 1 — 192.168.10.0/24
 
-### Verified
+| Device        | Interface | IP Address     | Subnet Mask   | Default Gateway |
+| ------------- | --------- | -------------- | ------------- | --------------- |
+| R1-CORE       | G0/0      | 192.168.10.1   | 255.255.255.0 | —               |
+| SW1-MGMT      | VLAN 1    | 192.168.10.2   | 255.255.255.0 | 192.168.10.1    |
+| Syslog Server | NIC       | 192.168.10.100 | 255.255.255.0 | 192.168.10.1    |
+| Management PC | NIC       | 192.168.10.101 | 255.255.255.0 | 192.168.10.1    |
+| PC1           | NIC       | 192.168.10.10  | 255.255.255.0 | 192.168.10.1    |
+| PC2           | NIC       | 192.168.10.11  | 255.255.255.0 | 192.168.10.1    |
 
-- Device Name
-- Platform
-- Interface Information
-- IP Address
-- Connected Port
+## LAN 2 — 192.168.20.0/24
 
-Commands Used
+| Device   | Interface | IP Address    | Subnet Mask   | Default Gateway |
+| -------- | --------- | ------------- | ------------- | --------------- |
+| R2-EDGE  | G0/0      | 192.168.20.1  | 255.255.255.0 | —               |
+| SW2-EDGE | VLAN 1    | 192.168.20.2  | 255.255.255.0 | 192.168.20.1    |
+| PC3      | NIC       | 192.168.20.10 | 255.255.255.0 | 192.168.20.1    |
+| PC4      | NIC       | 192.168.20.11 | 255.255.255.0 | 192.168.20.1    |
 
-```bash
+## Router-to-Router Transit Network
+
+| Device  | Interface | IP Address  |
+| ------- | --------- | ----------- |
+| R1-CORE | G0/1      | 10.0.0.1/30 |
+| R2-EDGE | G0/1      | 10.0.0.2/30 |
+
+---
+
+# 🔌 Physical Connections
+
+| Source   | Interface | Destination   | Interface |
+| -------- | --------- | ------------- | --------- |
+| R1-CORE  | G0/0      | SW1-MGMT      | G0/1      |
+| R1-CORE  | G0/1      | R2-EDGE       | G0/1      |
+| R2-EDGE  | G0/0      | SW2-EDGE      | G0/1      |
+| SW1-MGMT | Fa0/1     | PC1           | NIC       |
+| SW1-MGMT | Fa0/2     | PC2           | NIC       |
+| SW1-MGMT | Fa0/3     | Syslog Server | NIC       |
+| SW1-MGMT | Fa0/4     | Management PC | NIC       |
+| SW2-EDGE | Fa0/1     | PC3           | NIC       |
+| SW2-EDGE | Fa0/2     | PC4           | NIC       |
+
+---
+
+# ⚙️ Technologies Used
+
+* Cisco Packet Tracer
+* Cisco IOS CLI
+* IPv4
+* Static Routing
+* Layer 2 Switching
+* Syslog
+* CDP
+* LLDP
+* SSH
+* Remote Device Management
+* Network Monitoring
+* Network Troubleshooting
+
+---
+
+# 🔧 Network Configuration
+
+## 1. Router 1 — R1-CORE
+
+### Basic Configuration
+
+```cisco
+enable
+configure terminal
+
+hostname R1-CORE
+
+interface gigabitEthernet 0/0
+ip address 192.168.10.1 255.255.255.0
+no shutdown
+exit
+
+interface gigabitEthernet 0/1
+ip address 10.0.0.1 255.255.255.252
+no shutdown
+exit
+```
+
+### Static Route
+
+```cisco
+ip route 192.168.20.0 255.255.255.0 10.0.0.2
+```
+
+---
+
+## 2. Router 2 — R2-EDGE
+
+```cisco
+enable
+configure terminal
+
+hostname R2-EDGE
+
+interface gigabitEthernet 0/0
+ip address 192.168.20.1 255.255.255.0
+no shutdown
+exit
+
+interface gigabitEthernet 0/1
+ip address 10.0.0.2 255.255.255.252
+no shutdown
+exit
+```
+
+### Static Route
+
+```cisco
+ip route 192.168.10.0 255.255.255.0 10.0.0.1
+```
+
+---
+
+# 🔀 Switch Configuration
+
+## Switch 1 — SW1-MGMT
+
+```cisco
+enable
+configure terminal
+
+hostname SW1-MGMT
+
+interface vlan 1
+ip address 192.168.10.2 255.255.255.0
+no shutdown
+exit
+
+ip default-gateway 192.168.10.1
+
+end
+copy running-config startup-config
+```
+
+---
+
+## Switch 2 — SW2-EDGE
+
+```cisco
+enable
+configure terminal
+
+hostname SW2-EDGE
+
+interface vlan 1
+ip address 192.168.20.2 255.255.255.0
+no shutdown
+exit
+
+ip default-gateway 192.168.20.1
+
+end
+copy running-config startup-config
+```
+
+---
+
+# 📄 Syslog Configuration
+
+A centralized Syslog Server is used to collect system messages from network devices.
+
+### Syslog Server
+
+Configure the server with:
+
+```text
+IP Address:      192.168.10.100
+Subnet Mask:     255.255.255.0
+Default Gateway: 192.168.10.1
+```
+
+Navigate to:
+
+```text
+Server
+   ↓
+Services
+   ↓
+SYSLOG
+   ↓
+ON
+```
+
+### Configure Network Devices
+
+Run on R1, R2, SW1 and SW2:
+
+```cisco
+logging 192.168.10.100
+logging trap informational
+logging buffered 16384
+```
+
+### Verification
+
+```cisco
+show logging
+```
+
+The Syslog server is used to monitor events such as:
+
+* Interface status changes
+* Configuration changes
+* System messages
+* Device startup events
+* Network events
+
+---
+
+# 🔍 Cisco Discovery Protocol — CDP
+
+CDP is used to discover directly connected Cisco devices.
+
+### Enable CDP
+
+```cisco
+enable
+configure terminal
+cdp run
+end
+```
+
+Run on all Cisco routers and switches.
+
+### Verification
+
+```cisco
 show cdp neighbors
+```
+
+Detailed information:
+
+```cisco
 show cdp neighbors detail
 ```
 
+### Information Verified
+
+* Neighbor device name
+* Device platform
+* Local interface
+* Remote interface
+* IP address
+* Device capabilities
+
 ---
 
-## 🌐 Link Layer Discovery Protocol (LLDP)
+# 🌐 Link Layer Discovery Protocol — LLDP
 
-Configured LLDP for vendor-neutral device discovery.
+LLDP provides vendor-neutral neighbor discovery.
 
-### Verified
+### Enable LLDP
 
-- Neighbor Information
-- Device Capabilities
-- Interface Details
-- Management Address
+Run on all supported Cisco devices:
 
-Commands Used
+```cisco
+enable
+configure terminal
+lldp run
+end
+```
 
-```bash
+### Verification
+
+```cisco
 show lldp neighbors
+```
+
+Detailed information:
+
+```cisco
 show lldp neighbors detail
 ```
 
----
+### Information Verified
 
-## 🔐 Secure Shell (SSH)
-
-Configured secure remote device management.
-
-### Configuration Includes
-
-- Hostname
-- Domain Name
-- RSA Key Generation
-- Local User Database
-- SSH Version 2
-- VTY Configuration
-
-Verified
-
-- Successful Remote Login
-- Authentication
-- Secure CLI Access
+* Neighbor device
+* Local interface
+* Remote interface
+* Device capabilities
+* Management information
 
 ---
 
-## 🌍 Example IP Addressing
+# 🔐 Secure Shell — SSH
 
-| Device | IP Address |
-|----------|------------|
-| Router 1 | 192.168.10.1 |
-| Router 2 | 192.168.20.1 |
-| Switch 1 | 192.168.10.2 |
-| Switch 2 | 192.168.20.2 |
-| Syslog Server | 192.168.10.100 |
-| Management PC | 192.168.10.101 |
+SSH is configured to provide secure remote administration of network devices.
+
+## Step 1 — Configure Domain Name
+
+```cisco
+ip domain-name networklab.local
+```
+
+## Step 2 — Create Local User
+
+```cisco
+username admin privilege 15 secret Cisco@123
+```
+
+## Step 3 — Generate RSA Keys
+
+```cisco
+crypto key generate rsa
+```
+
+Use:
+
+```text
+1024
+```
+
+when prompted for the modulus size.
+
+## Step 4 — Enable SSH Version 2
+
+```cisco
+ip ssh version 2
+```
+
+## Step 5 — Configure VTY Lines
+
+```cisco
+line vty 0 4
+login local
+transport input ssh
+exit
+```
+
+Save configuration:
+
+```cisco
+end
+copy running-config startup-config
+```
+
+Repeat the SSH configuration on:
+
+* R1-CORE
+* R2-EDGE
+* SW1-MGMT
+* SW2-EDGE
 
 ---
 
-## 🧪 Verification Performed
+# 🖥️ SSH Verification
 
-### ✅ Syslog
+From the Management PC:
 
-- Interface Up Event Logged
-- Interface Down Event Logged
-- Login Success Logged
-- Login Failure Logged
-- Configuration Changes Logged
-- Device Startup Logged
+```text
+Desktop
+   ↓
+Command Prompt
+```
 
----
+Test connectivity:
 
-### ✅ SSH
+```text
+ping 192.168.10.1
+```
 
-- Remote Login Successful
-- Authentication Verified
-- Secure CLI Access
+Then connect using SSH:
 
----
+```text
+ssh -l admin 192.168.10.1
+```
 
-### ✅ CDP
+Enter the configured password.
 
-Verified Neighbor Discovery
+Successful access should provide:
 
-```bash
-show cdp neighbors
-show cdp neighbors detail
+```text
+R1-CORE#
+```
+
+Test switch management:
+
+```text
+ssh -l admin 192.168.10.2
+```
+
+Expected prompt:
+
+```text
+SW1-MGMT#
 ```
 
 ---
 
-### ✅ LLDP
+# 🧪 Network Connectivity Testing
 
-Verified Neighbor Discovery
+Connectivity was verified between the two LANs.
 
-```bash
-show lldp neighbors
-show lldp neighbors detail
+### From Management PC
+
+```text
+ping 192.168.10.1
+ping 192.168.10.2
+ping 192.168.10.100
+ping 192.168.20.1
+ping 192.168.20.2
+ping 192.168.20.10
+ping 192.168.20.11
 ```
+
+Successful responses confirm:
+
+* Local LAN connectivity
+* Router connectivity
+* Inter-router connectivity
+* Static routing
+* Remote LAN reachability
 
 ---
 
-## 📸 Project Screenshots
+# 🧪 Syslog Event Testing
 
-Store screenshots inside the **images/** directory.
+To verify that centralized logging is working, network events were deliberately generated.
+
+## Interface Down Event
+
+On R1:
+
+```cisco
+configure terminal
+
+interface gigabitEthernet 0/0
+shutdown
+
+end
+```
+
+The interface-down event should appear in the Syslog Server.
+
+## Interface Up Event
+
+```cisco
+configure terminal
+
+interface gigabitEthernet 0/0
+no shutdown
+
+end
+```
+
+The interface-up event should then be logged.
+
+---
+
+# 📝 Configuration Change Testing
+
+A harmless configuration change can be used to generate a configuration event.
 
 Example:
 
+```cisco
+configure terminal
+
+interface gigabitEthernet 0/0
+description LAN-to-SW1
+
+end
 ```
-images/
-│
-├── topology.png
-├── ssh-login.png
-├── syslog-server.png
-├── show-cdp-neighbors.png
-├── show-lldp-neighbors.png
-├── login-attempts.png
-├── interface-events.png
-└── configuration-change-log.png
+
+Verify local logging:
+
+```cisco
+show logging
+```
+
+The configuration-related Syslog message can then be observed on the centralized Syslog Server.
+
+---
+
+# 🔎 Verification Commands
+
+The following Cisco IOS commands were used during the project.
+
+### Interface Status
+
+```cisco
+show ip interface brief
+```
+
+### Routing Table
+
+```cisco
+show ip route
+```
+
+### CDP
+
+```cisco
+show cdp neighbors
+show cdp neighbors detail
+```
+
+### LLDP
+
+```cisco
+show lldp neighbors
+show lldp neighbors detail
+```
+
+### Syslog
+
+```cisco
+show logging
+```
+
+### SSH
+
+```cisco
+show ip ssh
+```
+
+### Running Configuration
+
+```cisco
+show running-config
 ```
 
 ---
 
-## 📁 Repository Structure
+# ✅ Project Verification
 
+| Test                          | Result     |
+| ----------------------------- | ---------- |
+| Router-to-router connectivity | ✅ Verified |
+| LAN connectivity              | ✅ Verified |
+| Inter-LAN connectivity        | ✅ Verified |
+| Static routing                | ✅ Verified |
+| Switch management IP          | ✅ Verified |
+| Centralized Syslog            | ✅ Verified |
+| Interface UP event            | ✅ Verified |
+| Interface DOWN event          | ✅ Verified |
+| Configuration-change logging  | ✅ Verified |
+| CDP neighbor discovery        | ✅ Verified |
+| LLDP neighbor discovery       | ✅ Verified |
+| SSH remote login              | ✅ Verified |
+| Cisco IOS verification        | ✅ Verified |
+
+---
+
+# 📸 Project Screenshots
+
+The following screenshots document the implementation and verification of the project.
+
+Store all screenshots inside the `images/` directory.
+
+## Required Screenshots
+
+### 1. Network Topology
+
+```text
+images/topology.png
 ```
-Network-Monitoring-Lab/
+
+Show the complete Packet Tracer topology with all devices and connections.
+
+---
+
+### 2. IP Interface Status
+
+```text
+images/ip-addressing.png
+```
+
+Show:
+
+```cisco
+show ip interface brief
+```
+
+The screenshot should clearly show the configured interfaces and their `up/up` status.
+
+---
+
+### 3. Connectivity Test
+
+```text
+images/connectivity-test.png
+```
+
+Show successful ping results from the Management PC to devices on both networks.
+
+---
+
+### 4. Syslog Server
+
+```text
+images/syslog-server.png
+```
+
+Show:
+
+```text
+Server → Services → SYSLOG
+```
+
+with received network messages visible.
+
+---
+
+### 5. Interface Events
+
+```text
+images/interface-events.png
+```
+
+Show Syslog messages generated by:
+
+```text
+Interface Down
+Interface Up
+```
+
+---
+
+### 6. Configuration Change Log
+
+```text
+images/configuration-change-log.png
+```
+
+Show the Syslog message generated after a configuration change.
+
+---
+
+### 7. Local Logging
+
+```text
+images/show-logging.png
+```
+
+Show:
+
+```cisco
+show logging
+```
+
+on a router.
+
+---
+
+### 8. CDP Neighbor Discovery
+
+```text
+images/cdp.png
+```
+
+Show:
+
+```cisco
+show cdp neighbors
+```
+
+and, preferably, detailed neighbor information.
+
+---
+
+### 9. LLDP Neighbor Discovery
+
+```text
+images/lldp.png
+```
+
+Show:
+
+```cisco
+show lldp neighbors
+```
+
+---
+
+### 10. SSH Login
+
+```text
+images/ssh-login.png
+```
+
+Show a successful SSH login from the Management PC:
+
+```text
+ssh -l admin 192.168.10.1
+```
+
+with the resulting:
+
+```text
+R1-CORE#
+```
+
+prompt visible.
+
+---
+
+# 📁 Repository Structure
+
+```text
+Network Monitoring Lab/
 │
 ├── Network-Monitoring.pkt
 ├── README.md
@@ -242,11 +799,15 @@ Network-Monitoring-Lab/
 │
 ├── images/
 │   ├── topology.png
-│   ├── syslog.png
-│   ├── ssh.png
+│   ├── ip-addressing.png
+│   ├── connectivity-test.png
+│   ├── syslog-server.png
+│   ├── interface-events.png
+│   ├── configuration-change-log.png
+│   ├── show-logging.png
 │   ├── cdp.png
 │   ├── lldp.png
-│   └── logs.png
+│   └── ssh-login.png
 │
 └── documentation/
     └── Network-Design.pdf
@@ -254,78 +815,155 @@ Network-Monitoring-Lab/
 
 ---
 
-## 📚 Concepts Practiced
+# 📚 Concepts Practiced
 
-- Enterprise Network Monitoring
-- Syslog Configuration
-- Centralized Logging
-- SSH Remote Access
-- Cisco Discovery Protocol (CDP)
-- Link Layer Discovery Protocol (LLDP)
-- Cisco IOS CLI
-- Device Management
-- Network Troubleshooting
-- Secure Administration
+This project provided hands-on practice with:
 
----
-
-## 🚀 Learning Outcomes
-
-Through this project, I gained hands-on experience in:
-
-- Configuring centralized Syslog logging
-- Monitoring network events and device activity
-- Securing remote device access using SSH
-- Discovering neighboring devices with CDP and LLDP
-- Verifying interface status and configuration changes
-- Troubleshooting network connectivity and management services
-- Applying enterprise network monitoring best practices
+* IPv4 addressing
+* Subnetting
+* Static routing
+* Layer 2 switching
+* Cisco IOS CLI
+* Network device management
+* Centralized logging
+* Syslog
+* CDP
+* LLDP
+* SSH
+* Remote device administration
+* Network troubleshooting
+* Interface monitoring
+* Configuration monitoring
+* Enterprise network operations
 
 ---
 
-## 💼 Real-World Applications
+# 💡 Real-World Applications
 
-This project demonstrates technologies commonly used in production enterprise networks for:
+The technologies implemented in this lab are commonly associated with:
 
-- Network Operations Center (NOC)
-- Enterprise Network Monitoring
-- Infrastructure Management
-- Security Auditing
-- Remote Device Administration
-- Incident Investigation
-- Configuration Management
-- Fault Detection and Troubleshooting
+### 🖥️ Network Operations Center — NOC
 
----
+* Device monitoring
+* Event monitoring
+* Fault detection
+* Troubleshooting
 
-## 🛠️ Future Improvements
+### 🔐 Network Security
 
-- SNMP Monitoring
-- NTP Configuration
-- Syslog Severity Levels
-- AAA Authentication (RADIUS/TACACS+)
-- Email Alerts
-- Network Time Synchronization
-- Syslog Log Rotation
-- Syslog over TLS
-- NetFlow Traffic Analysis
-- Network Monitoring Dashboard
+* Secure remote administration
+* Login monitoring
+* Configuration monitoring
+* Security event logging
 
----
+### 🌐 Enterprise Networking
 
-## 👨‍💻 Author
+* Device discovery
+* Network management
+* Centralized logging
+* Infrastructure monitoring
 
-**Tushar Patel**
+### 🛠️ Network Administration
 
-### Connect with me
-
-- **LinkedIn:** *https://www.linkedin.com/in/tushar-patel-s/*
-- **GitHub:** https://github.com/Tushar0589
+* Remote device access
+* Configuration management
+* Troubleshooting
+* Operational monitoring
 
 ---
 
-## ⭐ Support
+# 🚀 Future Improvements
 
-If you found this project useful, consider giving this repository a ⭐ on GitHub.
+The project can be expanded with additional enterprise networking and monitoring technologies.
 
-Feedback, suggestions, and contributions are always welcome!
+### Monitoring
+
+* SNMP
+* SNMPv3
+* Network monitoring dashboard
+* Interface utilization monitoring
+* Network performance monitoring
+
+### Time Synchronization
+
+* NTP
+* Centralized time synchronization
+
+### Security
+
+* AAA
+* RADIUS
+* TACACS+
+* SSH hardening
+* Login blocking
+* Password policies
+
+### Logging
+
+* Syslog severity levels
+* Centralized log management
+* Log filtering
+* Syslog over TLS
+* Log retention and rotation
+
+### Traffic Analysis
+
+* NetFlow
+* Traffic monitoring
+* Bandwidth analysis
+
+---
+
+# 🎓 Learning Outcomes
+
+After completing this project, I gained practical experience in:
+
+* Designing a small enterprise network topology
+* Configuring Cisco routers and switches
+* Implementing IPv4 addressing
+* Configuring static routing
+* Configuring centralized Syslog logging
+* Monitoring network events
+* Using CDP for Cisco device discovery
+* Using LLDP for neighbor discovery
+* Securing remote administration with SSH
+* Generating and analyzing network events
+* Verifying network connectivity
+* Troubleshooting network-device communication
+* Using Cisco IOS verification commands
+* Documenting a network infrastructure project
+
+---
+
+# 👨‍💻 Author
+
+## Tushar Patel
+
+Aspiring **Network & Cloud Engineer** with hands-on experience in Cisco networking, network troubleshooting, infrastructure technologies, and cloud fundamentals.
+
+### 🔗 Connect With Me
+
+* **LinkedIn:** [Tushar Patel](https://www.linkedin.com/in/tushar-patel-s/)
+* **GitHub:** [Tushar0589](https://github.com/Tushar0589)
+
+---
+
+# ⭐ Support
+
+If you found this project useful, consider giving the repository a ⭐ on GitHub.
+
+Feedback, suggestions, and contributions are welcome!
+
+---
+
+## 📌 Project Status
+
+**Status:** ✅ Completed
+
+**Platform:** Cisco Packet Tracer
+
+**Project Type:** Network Monitoring / Network Administration
+
+**Level:** CCNA / Entry-Level Network Engineer
+
+**Primary Technologies:** Syslog • CDP • LLDP • SSH • IPv4 • Static Routing • Cisco IOS
